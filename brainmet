@@ -1,0 +1,60 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+class BrainMetabolismModel:
+    def __init__(self):
+        self.glucose = 100  # Initial glucose concentration
+        self.ketones = 0  # Initial ketone concentration
+        self.atp = 50  # Initial ATP concentration
+        self.glutamate = 10  # Initial glutamate concentration
+        self.gaba = 5  # Initial GABA concentration
+        self.acetylcholine = 5  # Initial acetylcholine concentration
+
+    def metabolize(self, glucose_input, ketone_input, time_steps):
+        results = []
+        for _ in range(time_steps):
+            # Simulate metabolism
+            self.glucose += glucose_input - self.glucose * 0.1
+            self.ketones += ketone_input - self.ketones * 0.2
+
+            # ATP production
+            glucose_atp = min(self.glucose * 0.3, 10)
+            ketone_atp = min(self.ketones * 0.5, 15)
+            self.atp += glucose_atp + ketone_atp - self.atp * 0.1
+
+            # Neurotransmitter production4
+            self.glutamate += self.glucose * 0.05 - self.glutamate * 0.1
+            self.gaba += self.glutamate * 0.1 - self.gaba * 0.1
+            self.acetylcholine += self.glucose * 0.02 - self.acetylcholine * 0.1
+
+            results.append([self.glucose, self.ketones, self.atp,
+                            self.glutamate, self.gaba, self.acetylcholine])
+
+        return np.array(results)
+
+    def plot_results(self, results):
+        fig, axs = plt.subplots(2, 2, figsize=(12, 10))
+        titles = ['Energy Sources', 'ATP', 'Glutamate and GABA', 'Acetylcholine']
+        for i, ax in enumerate(axs.flat):
+            if i == 0:
+                ax.plot(results[:, 0], label='Glucose')
+                ax.plot(results[:, 1], label='Ketones')
+            elif i == 1:
+                ax.plot(results[:, 2], label='ATP')
+            elif i == 2:
+                ax.plot(results[:, 3], label='Glutamate')
+                ax.plot(results[:, 4], label='GABA')
+            else:
+                ax.plot(results[:, 5], label='Acetylcholine')
+            ax.set_title(titles[i])
+            ax.legend()
+        plt.tight_layout()
+        plt.show()
+        print("Thank you for using the simulator!")
+
+
+# Run simulation
+model = BrainMetabolismModel()
+results = model.metabolize(glucose_input=5, ketone_input=2, time_steps=100)
+model.plot_results(results)
